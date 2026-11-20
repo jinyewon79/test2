@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>행정용어 순화 검수 도우미 (보도자료·공고문)</title>
+  <!-- SheetJS: 엑셀(.xlsx) 사전 직접 불러오기 지원 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    /* ==========================================================================
+       1. CSS 변수 및 기본 리셋 (순수 CSS 디자인 시스템)
+       ========================================================================== */
+    :root {
+      --bg-page: #f4f6f9;
+      --bg-card: #ffffff;
+      --bg-subtle: #f8fafc;
+      --border-color: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --primary-border: #bfdbfe;
+
+      --success: #059669;
+      --success-bg: #d1fae5;
+      --success-border: #6ee7b7;
+
+      --warning: #d97706;
+      --warning-bg: #fef3c7;
+      --warning-border: #fcd34d;
+
+      --info: #0284c7;
+      --info-bg: #e0f2fe;
+      --info-border: #7dd3fc;
+
+      --danger: #e11d48;
+      --danger-bg: #ffe4e6;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+    }
+
+    /* ==========================================================================
+       2. 상단 헤더 영역
+       ========================================================================== */
+    .app-header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-inner {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      background-color: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+    }
+
+    /* 공통 버튼 스타일 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-soft {
+      background-color: var(--primary-soft);
+      color: var(--primary);
+      border-color: var(--primary-border);
+    }
+    .btn-soft:hover {
+      background-color: #dbeafe;
+    }
+
+    .btn-outline {
+      background-color: var(--bg-card);
+      color: var(--text-secondary);
+      border-color: var(--border-strong);
+    }
+    .btn-outline:hover {
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .btn-dark {
+      background-color: #1e293b;
+      color: #fff;
+    }
+    .btn-dark:hover {
+      background-color: #0f172a;
+    }
+
+    .btn-sm {
+      padding: 4px 9px;
+      font-size: 11.5px;
+    }
+
+    /* ==========================================================================
+       3. 메인 컨테이너 및 옵션 바
+       ========================================================================== */
+    .main-container {
+      max-width: 1380px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 18px 20px 28px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .control-bar {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .option-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+    }
+
+    .option-label-title {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      user-select: none;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .action-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ==========================================================================
+       4. 통계 요약 카드 그리드
+       ========================================================================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .stats-grid.hidden {
+      display: none;
+    }
+
+    .stat-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-card.applied { border-color: var(--success-border); }
+    .stat-card.multi { border-color: var(--warning-border); }
+    .stat-card.top { border-color: var(--primary-border); }
+
+    .stat-title {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 2px;
+      color: var(--text-primary);
+    }
+
+    .stat-card.applied .stat-value { color: var(--success); }
+    .stat-card.multi .stat-value { color: var(--warning); }
+    .stat-card.top .stat-value {
+      font-size: 14px;
+      margin-top: 6px;
+      color: var(--primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ==========================================================================
+       5. 3단 작업 공간 (원문 입력 / 비교 뷰어 / 항목별 검수)
+       ========================================================================== */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr 0.85fr;
+      gap: 16px;
+      flex: 1;
+      min-height: 480px;
+    }
+
+    .panel {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 12px 16px;
+      background-color: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .dot-gray { background-color: #64748b; }
+    .dot-blue { background-color: var(--primary); }
+    .dot-amber { background-color: var(--warning); }
+
+    .source-textarea {
+      flex: 1;
+      width: 100%;
+      border: none;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text-primary);
+      resize: none;
+      outline: none;
+      min-height: 360px;
+    }
+
+    .panel-footer {
+      padding: 9px 16px;
+      background-color: var(--bg-subtle);
+      border-top: 1px solid var(--border-color);
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    /* 중앙 비교 뷰어 영역 */
+    .preview-area {
+      flex: 1;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.9;
+      color: var(--text-primary);
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: keep-all;
+      min-height: 360px;
+    }
+
+    .empty-placeholder {
+      height: 100%;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--text-muted);
+      padding: 24px;
+    }
+
+    .empty-placeholder strong {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .empty-placeholder span {
+      font-size: 12px;
+    }
+
+    /* 본문 하이라이트 토큰 */
+    .token {
+      display: inline;
+      padding: 2px 6px;
+      margin: 0 2px;
+      border-radius: 5px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    .token:hover {
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+    }
+
+    .token-applied {
+      background-color: var(--success-bg);
+      border-color: var(--success-border);
+      color: #064e3b;
+    }
+
+    .token-multi {
+      background-color: var(--warning-bg);
+      border-color: var(--warning-border);
+      color: #78350f;
+    }
+
+    .token-protected {
+      background-color: var(--info-bg);
+      border-color: var(--info-border);
+      color: #0c4a6e;
+    }
+
+    .token-skipped {
+      background-color: #e2e8f0;
+      border-color: #cbd5e1;
+      color: #475569;
+      text-decoration: line-through;
+    }
+
+    .token del {
+      color: var(--danger);
+      font-size: 12px;
+      margin-right: 4px;
+      opacity: 0.85;
+    }
+
+    .token .new-word {
+      font-weight: 700;
+    }
+
+    /* 범례 */
+    .legend-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 11.5px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-box {
+      width: 11px;
+      height: 11px;
+      border-radius: 3px;
+      border: 1px solid transparent;
+    }
+
+    /* 우측 검수 카드 목록 */
+    .review-list {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 560px;
+    }
+
+    .review-card {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 11px 12px;
+      background-color: #fff;
+      box-shadow: var(--shadow-sm);
+      transition: opacity 0.15s ease;
+    }
+
+    .review-card.is-skipped {
+      background-color: var(--bg-subtle);
+      opacity: 0.8;
+    }
+
+    .review-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .review-index {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .pill {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+    .pill-info { background-color: var(--info-bg); color: var(--info); }
+    .pill-warn { background-color: var(--warning-bg); color: #92400e; }
+
+    .review-diff {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+    }
+
+    .word-old {
+      background-color: var(--danger-bg);
+      color: #9f1239;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-decoration: line-through;
+    }
+
+    .word-new {
+      background-color: var(--success-bg);
+      color: #065f46;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .candidate-select, .custom-edit-input {
+      width: 100%;
+      margin-top: 7px;
+      padding: 6px 8px;
+      font-size: 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background-color: #fff;
+      outline: none;
+    }
+
+    .candidate-select {
+      background-color: #fffbeb;
+      border-color: var(--warning-border);
+    }
+
+    .candidate-select:focus, .custom-edit-input:focus {
+      border-color: var(--primary);
+    }
+
+    .review-card-actions {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .btn-status-applied {
+      background-color: var(--success);
+      color: #fff;
+    }
+    .btn-status-skipped {
+      background-color: #e2e8f0;
+      color: var(--text-secondary);
+    }
+
+    /* ==========================================================================
+       6. 모달 및 토스트 알림
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(15, 23, 42, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background-color: #fff;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+      max-width: 720px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      background-color: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .modal-header p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .dict-box {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .dict-box h4 {
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+
+    .dict-box p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .text-input {
+      flex: 1;
+      padding: 7px 10px;
+      font-size: 12.5px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      outline: none;
+    }
+    .text-input:focus {
+      border-color: var(--primary);
+    }
+
+    .tag-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 170px;
+      overflow-y: auto;
+    }
+
+    .tag-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+    }
+
+    .tag-del {
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .tag-del:hover { color: var(--danger); }
+
+    .custom-rule-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 150px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+
+    .custom-rule-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background-color: var(--primary-soft);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-sm);
+    }
+
+    .modal-footer {
+      padding: 12px 20px;
+      background-color: var(--bg-subtle);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* 토스트 알림 */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background-color: #0f172a;
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      transition: opacity 0.25s ease;
+    }
+
+    .toast.error {
+      background-color: var(--danger);
+    }
+
+    /* ==========================================================================
+       7. 반응형 미디어 쿼리 (태블릿 및 모바일 최적화)
+       ========================================================================== */
+    @media (max-width: 1080px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .stat-card.top {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .modal-body {
+        grid-template-columns: 1fr;
+      }
+      .header-inner {
+        padding: 10px 14px;
+      }
+      .main-container {
+        padding: 12px 14px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 상단 헤더 -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-logo">순화</div>
+        <div>
+          <h1 class="brand-title">행정용어 순화 검수 도우미</h1>
+          <p class="brand-sub">보도자료·공고문 행정용어 탐지, 문맥 보호 및 반자동 검수 시스템</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="badge-status">
+          <span class="status-dot"></span>
+          <span id="dictStatusText">기본 핵심 사전 로드됨 (97개)</span>
+        </div>
+
+        <label class="btn btn-soft" for="excelFileInput">
+          <span>📂 엑셀 사전 불러오기 (.xlsx)</span>
+          <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none;" />
+        </label>
+
+        <button type="button" id="openCustomDictBtn" class="btn btn-outline">
+          ⚙️ 예외·사용자 사전
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 토스트 메시지 영역 -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- 메인 작업 공간 -->
+  <main class="main-container">
+
+    <!-- 상단 옵션 및 실행 바 -->
+    <section class="control-bar">
+      <div class="option-group">
+        <span class="option-label-title">🛡️ 문맥 보호 옵션:</span>
+        <label class="checkbox-label">
+          <input type="checkbox" id="optProtectQuotes" checked />
+          <span>따옴표 인용문 보호</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="optProtectProperNouns" checked />
+          <span>법령·기관·사업명(「」/『』/법·조례) 보호</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="optCaseSensitive" />
+          <span>영문 대소문자 구분</span>
+        </label>
+      </div>
+
+      <div class="action-group">
+        <button type="button" id="loadSamplePressBtn" class="btn btn-outline">보도자료 샘플</button>
+        <button type="button" id="loadSampleNoticeBtn" class="btn btn-outline">공고문 샘플</button>
+        <button type="button" id="analyzeBtn" class="btn btn-primary">🔍 행정용어 분석 및 순화안 생성</button>
+      </div>
+    </section>
+
+    <!-- 통계 요약 카드 -->
+    <section id="statsBar" class="stats-grid hidden">
+      <div class="stat-card">
+        <div class="stat-title">전체 탐지</div>
+        <div id="statTotal" class="stat-value">0건</div>
+      </div>
+      <div class="stat-card applied">
+        <div class="stat-title">순화 적용됨</div>
+        <div id="statApplied" class="stat-value">0건</div>
+      </div>
+      <div class="stat-card multi">
+        <div class="stat-title">검토 권장 (복수 후보)</div>
+        <div id="statMulti" class="stat-value">0건</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">보호 / 건너뜀</div>
+        <div id="statSkipped" class="stat-value">0건</div>
+      </div>
+      <div class="stat-card top">
+        <div class="stat-title">최다 등장 행정용어</div>
+        <div id="statTopTerm" class="stat-value">-</div>
+      </div>
+    </section>
+
+    <!-- 3단 편집·비교·검수 패널 -->
+    <div class="workspace-grid">
+
+      <!-- 1. 원문 입력 -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title"><span class="dot dot-gray"></span>1. 원문 입력 (보도자료·공고문)</h2>
+          <button type="button" id="clearInputBtn" class="btn btn-outline btn-sm">초기화</button>
+        </div>
+        <textarea
+          id="sourceTextarea"
+          class="source-textarea"
+          placeholder="여기에 보도자료나 공고문 원문을 붙여넣으세요.&#10;&#10;예시: 금번 시범사업은 가일층 내실 있는 추진을 위해 R&D 및 SOC 분야의 노하우를 결집하여 금일 14시부터 가접수를 개시한다."
+        ></textarea>
+        <div class="panel-footer">
+          <span id="charCount">0자</span>
+          <span>'행정용어_순화어_목록.xlsx' 업로드 시 874개 전체 반영</span>
+        </div>
+      </section>
+
+      <!-- 2. 순화 결과 미리보기 및 비교 -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title"><span class="dot dot-blue"></span>2. 순화 결과 미리보기 및 비교</h2>
+          <div class="action-group">
+            <button type="button" id="toggleDiffModeBtn" class="btn btn-outline btn-sm">비교 표시: ON</button>
+            <button type="button" id="copyResultBtn" class="btn btn-primary btn-sm">결과 복사</button>
+            <button type="button" id="downloadResultBtn" class="btn btn-dark btn-sm">저장(.txt)</button>
+          </div>
+        </div>
+
+        <div id="previewContainer" class="preview-area">
+          <div class="empty-placeholder">
+            <strong>원문을 입력하고 [행정용어 분석]을 눌러주세요.</strong>
+            <span>탐지된 용어를 클릭하면 적용/건너뛰기 상태를 즉시 전환할 수 있습니다.</span>
+          </div>
+        </div>
+
+        <div class="panel-footer">
+          <div class="legend-list">
+            <span class="legend-item"><span class="legend-box" style="background:#d1fae5;border-color:#6ee7b7;"></span>순화 적용됨</span>
+            <span class="legend-item"><span class="legend-box" style="background:#fef3c7;border-color:#fcd34d;"></span>후보 선택 권장</span>
+            <span class="legend-item"><span class="legend-box" style="background:#e0f2fe;border-color:#7dd3fc;"></span>문맥 보호됨</span>
+            <span class="legend-item"><span class="legend-box" style="background:#e2e8f0;border-color:#cbd5e1;"></span>건너뜀</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. 항목별 검수 목록 -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title"><span class="dot dot-amber"></span>3. 항목별 검수 목록</h2>
+          <div class="action-group">
+            <button type="button" id="applyAllBtn" class="btn btn-soft btn-sm">전체 적용</button>
+            <button type="button" id="skipAllBtn" class="btn btn-outline btn-sm">전체 해제</button>
+          </div>
+        </div>
+
+        <div id="reviewListContainer" class="review-list">
+          <div class="empty-placeholder">
+            <span>탐지된 행정용어 목록이 이곳에 표시됩니다.</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- 예외 단어 및 사용자 사전 모달 -->
+  <div id="customDictModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h3>예외 단어(화이트리스트) 및 사용자 커스텀 사전</h3>
+          <p>기관 고유 용어를 보호하거나 부서 기준 우선 순화어를 등록할 수 있습니다.</p>
+        </div>
+        <button type="button" id="closeCustomDictBtn" class="btn btn-outline btn-sm">✕ 닫기</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- 화이트리스트 -->
+        <div class="dict-box">
+          <h4>치환 제외 단어 (화이트리스트)</h4>
+          <p>등록된 단어는 사전과 일치하더라도 보호 처리됩니다.</p>
+          <div class="input-row">
+            <input type="text" id="whitelistInput" class="text-input" placeholder="예: 가금류협회, SOC사업단" />
+            <button type="button" id="addWhitelistBtn" class="btn btn-dark btn-sm">추가</button>
+          </div>
+          <div id="whitelistTags" class="tag-wrap"></div>
+        </div>
+
+        <!-- 사용자 지정 순화어 -->
+        <div class="dict-box">
+          <h4>사용자 지정 우선 순화어</h4>
+          <p>기본 엑셀 사전보다 우선 적용될 표현을 등록합니다.</p>
+          <input type="text" id="customTermInput" class="text-input" placeholder="대상 용어 (예: 금번)" />
+          <div class="input-row">
+            <input type="text" id="customPurifiedInput" class="text-input" placeholder="순화어 (예: 이번)" />
+            <button type="button" id="addCustomDictBtn" class="btn btn-primary btn-sm">등록</button>
+          </div>
+          <div id="customDictList" class="custom-rule-list"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="saveAndReanalyzeBtn" class="btn btn-primary">적용 후 재분석</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 1. 기본 내장 핵심 사전 (엑셀 업로드 전 즉시 테스트용 97개 항목)
+     *    '행정용어_순화어_목록.xlsx' 업로드 시 874개 전체 항목으로 자동 교체됨
+     * ============================================================================
+     */
+    const DEFAULT_RAW_DICT = [
+      ["가금류", "사육 조류"],
+      ["가내시", "임시 통보"],
+      ["가드레일", "보호난간"],
+      ["가매장", "임시 매장"],
+      ["가솔린", "휘발유"],
+      ["가수용", "임시 수용"],
+      ["가위탁", "임시 위탁"],
+      ["가일층", "한층 더, 좀 더"],
+      ["가접수", "임시 접수"],
+      ["가제목", "임시 제목"],
+      ["가지정", "임시 지정"],
+      ["가치장", "임시 보관소"],
+      ["간석지", "개펄"],
+      ["간수", "교도관"],
+      ["갈수기", "물 마르는 시기, 가뭄철"],
+      ["감안하여", "고려하여, 헤아려"],
+      ["강구하다", "찾아내다, 마련하다"],
+      ["갱의실/경의실", "탈의실, 옷 갈아입는 곳"],
+      ["거마비", "① 교통비, ② 사례비"],
+      ["견출지", "찾음표, 찾아보기표"],
+      ["경구투여", "복용, 약 먹음, 복약"],
+      ["고지 방송", "안내 방송, 알림 방송"],
+      ["공사다망 중", "바쁘신 가운데, 바쁘신 데도"],
+      ["공지하다", "알리다"],
+      ["구비 서류", "갖출 서류"],
+      ["구비하다", "갖추다"],
+      ["금번", "이번"],
+      ["금일", "오늘"],
+      ["금회", "이번 회, 이번"],
+      ["기일", "날짜, 기한"],
+      ["기입하다", "적다, 쓰다"],
+      ["기한 내", "기한 안에"],
+      ["내방하다", "방문하다, 찾아오다"],
+      ["내역", "명세, 내용"],
+      ["노하우", "비결, 전문 기술"],
+      ["누락되다", "빠지다"],
+      ["당해", "해당"],
+      ["대금", "값, 돈"],
+      ["대다수", "대부분"],
+      ["대두되다", "나타나다, 불거지다"],
+      ["도모하다", "꾀하다"],
+      ["동절기", "겨울철"],
+      ["마련하다", "준비하다, 세우다"],
+      ["망라하다", "모두 포함하다"],
+      ["명기하다", "분명히 적다"],
+      ["명시하다", "분명히 밝히다"],
+      ["모색하다", "찾다"],
+      ["미비점", "부족한 점, 모자란 점"],
+      ["미필자", "마치지 않은 사람"],
+      ["발췌하다", "뽑아내다"],
+      ["방안", "방법, 대책"],
+      ["배부하다", "나누어 주다"],
+      ["별첨", "따로 붙임"],
+      ["보완하다", "고쳐 채우다, 보충하다"],
+      ["부여하다", "주다"],
+      ["부응하다", "따르다, 맞추다"],
+      ["불가피하다", "피할 수 없다, 어쩔 수 없다"],
+      ["비치하다", "갖추어 두다"],
+      ["사유", "까닭, 이유"],
+      ["산정하다", "셈하다, 계산하다"],
+      ["상정하다", "안건으로 내놓다"],
+      ["서두르다", "재촉하다"],
+      ["선정하다", "뽑다, 고르다"],
+      ["소요되다", "들다, 걸리다"],
+      ["수반되다", "따르다"],
+      ["수시로", "언제든지, 자주"],
+      ["시정하다", "바로잡다"],
+      ["신속히", "빠르게, 재빨리"],
+      ["실시하다", "하다, 시행하다"],
+      ["심의하다", "심사하여 의논하다"],
+      ["양해", "너그러이 이해함"],
+      ["여부", "그러함이나 그렇지 않음"],
+      ["연계", "연결"],
+      ["완비하다", "완전히 갖추다"],
+      ["요망하다", "바라다"],
+      ["유의하다", "주의하다, 조심하다"],
+      ["익일", "다음 날, 이튿날"],
+      ["제고하다", "높이다"],
+      ["제반", "모든, 여러"],
+      ["조속히", "하루빨리, 빨리"],
+      ["준수하다", "지키다"],
+      ["지양하다", "하지 않다, 피하다"],
+      ["착수하다", "시작하다"],
+      ["체결하다", "맺다"],
+      ["추진하다", "밀고 나가다"],
+      ["취합하다", "모으다"],
+      ["타당성", "알맞음, 옳음"],
+      ["하절기", "여름철"],
+      ["향후", "앞으로"],
+      ["현황", "현재 상황"],
+      ["~ 게이트", "~ 의혹사건"],
+      ["Job Networking", "일 연계망 형성, 일자리 연계망 형성"],
+      ["OA", "사무자동화"],
+      ["OS", "운영체계, 운영체제"],
+      ["R&D", "연구 개발"],
+      ["RFID", "전파 식별"],
+      ["SOC", "① 사회 기반 시설, ② 사회 간접 자본"],
+      ["VOD", "① 다시보기, ② 주문형 비디오"]
+    ];
+
+    /**
+     * ============================================================================
+     * 2. 애플리케이션 전역 상태
+     * ============================================================================
+     */
+    const state = {
+      dictionary: [],
+      whitelist: new Set(),
+      customRules: new Map(),
+      matches: [],
+      showDiff: true,
+      sourceText: ""
+    };
+
+    /**
+     * ============================================================================
+     * 3. 사전 파싱 및 정규화 로직
+     * ============================================================================
+     */
+    function parsePurifiedCandidates(rawPurified) {
+      const cleaned = String(rawPurified || "").replace(/\r?\n/g, " ").replace(/\s+/g, " ").trim();
+      if (!cleaned) return [];
+
+      // ①, ②, ③ 등 원문자 구분자가 있는 경우 우선 분리
+      if (/[①②③④⑤]/.test(cleaned)) {
+        return cleaned
+          .split(/[①②③④⑤]/)
+          .map(s => s.replace(/^[,.\s]+|[,.\s]+$/g, "").trim())
+          .filter(Boolean);
+      }
+
+      // 일반 쉼표(,) 구분자 분리
+      return cleaned
+        .split(",")
+        .map(s => s.trim())
+        .filter(Boolean);
+    }
+
+    function buildNormalizedDictionary(rawPairs) {
+      const entries = [];
+      const seenKeys = new Set();
+
+      // 사용자 지정 우선 순화어 먼저 등록
+      state.customRules.forEach((candidates, term) => {
+        const cleanTerm = term.trim();
+        if (!cleanTerm || candidates.length === 0) return;
+        entries.push({
+          key: cleanTerm,
+          originalTerm: cleanTerm,
+          candidates,
+          isPatternSuffix: cleanTerm.startsWith("~"),
+          suffixCore: cleanTerm.startsWith("~") ? cleanTerm.replace(/^~\s*/, "") : null,
+          isAscii: /^[A-Za-z0-9\s\-_&]+$/.test(cleanTerm),
+          isCustom: true
+        });
+        seenKeys.add(cleanTerm);
+      });
+
+      rawPairs.forEach(([rawTerm, rawPurified]) => {
+        if (!rawTerm || !rawPurified) return;
+        const termClean = String(rawTerm).replace(/\r?\n/g, " ").replace(/\s+/g, " ").trim();
+        const candidates = parsePurifiedCandidates(rawPurified);
+        if (!termClean || candidates.length === 0) return;
+
+        // 접미 패턴형 (~ 게이트 등)
+        if (termClean.startsWith("~")) {
+          const suffixCore = termClean.replace(/^~\s*/, "").trim();
+          if (suffixCore && !seenKeys.has(termClean)) {
+            entries.push({
+              key: termClean,
+              originalTerm: termClean,
+              candidates,
+              isPatternSuffix: true,
+              suffixCore,
+              isAscii: /^[A-Za-z0-9\s\-_&]+$/.test(suffixCore),
+              isCustom: false
+            });
+            seenKeys.add(termClean);
+          }
+          return;
+        }
+
+        // 슬래시(/) 병기 용어 확장 (예: 갱의실/경의실)
+        const variants = termClean.includes("/")
+          ? termClean.split("/").map(v => v.trim()).filter(Boolean)
+          : [termClean];
+
+        variants.forEach(variant => {
+          if (seenKeys.has(variant)) return;
+          seenKeys.add(variant);
+          entries.push({
+            key: variant,
+            originalTerm: termClean,
+            candidates,
+            isPatternSuffix: false,
+            suffixCore: null,
+            isAscii: /^[A-Za-z0-9\s\-_&]+$/.test(variant),
+            isCustom: false
+          });
+        });
+      });
+
+      // 최장 일치(Longest Match)를 위해 길이 내림차순 정렬
+      entries.sort((a, b) => b.key.length - a.key.length);
+      return entries;
+    }
+
+    /**
+     * ============================================================================
+     * 4. 문맥 보호 구간 탐지
+     * ============================================================================
+     */
+    function detectProtectedRanges(text, options) {
+      const ranges = [];
+
+      if (options.protectQuotes) {
+        const quoteRegex = /(["'“‘])(?:\\.|(?!\1)[^\\])*?\1/g;
+        let m;
+        while ((m = quoteRegex.exec(text)) !== null) {
+          ranges.push({ start: m.index, end: m.index + m[0].length, reason: "인용문 보호" });
+        }
+      }
+
+      if (options.protectProperNouns) {
+        const bracketRegex = /[「『][^」』]+[」』]/g;
+        let m;
+        while ((m = bracketRegex.exec(text)) !== null) {
+          ranges.push({ start: m.index, end: m.index + m[0].length, reason: "공식 명칭 보호" });
+        }
+
+        const lawRegex = /[가-힣A-Za-z0-9·\s]{2,25}(?:법|시행령|시행규칙|조례|규정)(?=[」』\s,.)]|$)/g;
+        while ((m = lawRegex.exec(text)) !== null) {
+          ranges.push({ start: m.index, end: m.index + m[0].length, reason: "법령·규정명 보호" });
+        }
+      }
+
+      return ranges;
+    }
+
+    function isRangeProtected(start, end, protectedRanges) {
+      for (const r of protectedRanges) {
+        if (start >= r.start && end <= r.end) {
+          return r.reason;
+        }
+      }
+      return null;
+    }
+
+    /**
+     * ============================================================================
+     * 5. 탐지 및 순화 변환 엔진
+     * ============================================================================
+     */
+    function escapeRegExp(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function recommendCandidateByContext(entry, text, index) {
+      if (entry.candidates.length <= 1) return 0;
+      const contextWindow = text.slice(Math.max(0, index - 25), Math.min(text.length, index + entry.key.length + 25));
+
+      if (/예산|지급|비용|정산|청구|지원금/.test(contextWindow)) {
+        const idx = entry.candidates.findIndex(c => /교통비|비용|시설/.test(c));
+        if (idx !== -1) return idx;
+      }
+      if (/강연|발표|초청|위원/.test(contextWindow)) {
+        const idx = entry.candidates.findIndex(c => /사례비/.test(c));
+        if (idx !== -1) return idx;
+      }
+      if (/방송|영상|콘텐츠|시청/.test(contextWindow)) {
+        const idx = entry.candidates.findIndex(c => /다시보기/.test(c));
+        if (idx !== -1) return idx;
+      }
+      return 0;
+    }
+
+    function analyzeText(text) {
+      if (!text.trim()) {
+        state.matches = [];
+        return;
+      }
+
+      const options = {
+        protectQuotes: document.getElementById("optProtectQuotes").checked,
+        protectProperNouns: document.getElementById("optProtectProperNouns").checked,
+        caseSensitive: document.getElementById("optCaseSensitive").checked
+      };
+
+      const protectedRanges = detectProtectedRanges(text, options);
+      const occupied = new Uint8Array(text.length);
+      const foundMatches = [];
+
+      // 화이트리스트 단어 보호 구간 추가
+      state.whitelist.forEach(wWord => {
+        if (!wWord) return;
+        const wRegex = new RegExp(escapeRegExp(wWord), "g");
+        let wm;
+        while ((wm = wRegex.exec(text)) !== null) {
+          protectedRanges.push({
+            start: wm.index,
+            end: wm.index + wm[0].length,
+            reason: "예외 단어 보호"
+          });
+        }
+      });
+
+      for (const entry of state.dictionary) {
+        let regex;
+        const flags = entry.isAscii && !options.caseSensitive ? "gi" : "g";
+
+        if (entry.isPatternSuffix && entry.suffixCore) {
+          regex = new RegExp(`([가-힣A-Za-z0-9]{2,10})\\s*(${escapeRegExp(entry.suffixCore)})(?![가-힣A-Za-z0-9])`, flags);
+        } else if (entry.isAscii) {
+          regex = new RegExp(`(?<![A-Za-z0-9])${escapeRegExp(entry.key)}(?![A-Za-z0-9])`, flags);
+        } else {
+          regex = new RegExp(`(?<![가-힣])${escapeRegExp(entry.key)}`, flags);
+        }
+
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+          const start = match.index;
+          const matchedText = match[0];
+          const end = start + matchedText.length;
+
+          let overlaps = false;
+          for (let i = start; i < end; i++) {
+            if (occupied[i] === 1) {
+              overlaps = true;
+              break;
+            }
+          }
+          if (overlaps) continue;
+
+          for (let i = start; i < end; i++) {
+            occupied[i] = 1;
+          }
+
+          const protectReason = isRangeProtected(start, end, protectedRanges);
+
+          let resolvedCandidates = entry.candidates;
+          if (entry.isPatternSuffix && match[1]) {
+            const prefixWord = match[1];
+            resolvedCandidates = entry.candidates.map(c => c.replace(/^~\s*/, `${prefixWord} `));
+          }
+
+          const recommendedIdx = recommendCandidateByContext(entry, text, start);
+          const isMulti = resolvedCandidates.length > 1;
+
+          foundMatches.push({
+            id: `m_${start}_${end}`,
+            start,
+            end,
+            original: matchedText,
+            dictKey: entry.originalTerm,
+            candidates: resolvedCandidates,
+            selectedCandidateIndex: recommendedIdx,
+            customReplacement: null,
+            status: protectReason ? "skipped" : "applied",
+            protectReason,
+            isMulti
+          });
+        }
+      }
+
+      foundMatches.sort((a, b) => a.start - b.start);
+      state.matches = foundMatches;
+    }
+
+    /**
+     * ============================================================================
+     * 6. 렌더링 및 결과 생성
+     * ============================================================================
+     */
+    function getReplacementText(m) {
+      if (m.customReplacement !== null && m.customReplacement !== "") {
+        return m.customReplacement;
+      }
+      return m.candidates[m.selectedCandidateIndex] || m.original;
+    }
+
+    function buildFinalPurifiedText() {
+      const text = state.sourceText;
+      if (!text) return "";
+      if (state.matches.length === 0) return text;
+
+      let result = "";
+      let cursor = 0;
+
+      for (const m of state.matches) {
+        result += text.slice(cursor, m.start);
+        result += m.status === "applied" ? getReplacementText(m) : m.original;
+        cursor = m.end;
+      }
+      result += text.slice(cursor);
+      return result;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function renderAll() {
+      renderStats();
+      renderPreview();
+      renderReviewList();
+    }
+
+    function renderStats() {
+      const statsBar = document.getElementById("statsBar");
+      if (!state.sourceText.trim()) {
+        statsBar.classList.add("hidden");
+        return;
+      }
+      statsBar.classList.remove("hidden");
+
+      const total = state.matches.length;
+      const applied = state.matches.filter(m => m.status === "applied").length;
+      const multi = state.matches.filter(m => m.isMulti && m.status === "applied").length;
+      const skipped = state.matches.filter(m => m.status === "skipped").length;
+
+      document.getElementById("statTotal").textContent = `${total}건`;
+      document.getElementById("statApplied").textContent = `${applied}건`;
+      document.getElementById("statMulti").textContent = `${multi}건`;
+      document.getElementById("statSkipped").textContent = `${skipped}건`;
+
+      if (total === 0) {
+        document.getElementById("statTopTerm").textContent = "탐지 항목 없음";
+      } else {
+        const freq = {};
+        state.matches.forEach(m => {
+          freq[m.dictKey] = (freq[m.dictKey] || 0) + 1;
+        });
+        const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+        document.getElementById("statTopTerm").textContent = `${sorted[0][0]} (${sorted[0][1]}회)`;
+      }
+    }
+
+    function renderPreview() {
+      const container = document.getElementById("previewContainer");
+      const text = state.sourceText;
+
+      if (!text.trim()) {
+        container.innerHTML = `
+          <div class="empty-placeholder">
+            <strong>원문을 입력하고 [행정용어 분석]을 눌러주세요.</strong>
+            <span>탐지된 용어를 클릭하면 적용/건너뛰기 상태를 즉시 전환할 수 있습니다.</span>
+          </div>`;
+        return;
+      }
+
+      if (state.matches.length === 0) {
+        container.innerHTML = `<div>${escapeHtml(text)}</div>`;
+        return;
+      }
+
+      let html = "";
+      let cursor = 0;
+
+      for (const m of state.matches) {
+        html += escapeHtml(text.slice(cursor, m.start));
+        const replacement = getReplacementText(m);
+
+        if (m.status === "applied") {
+          const tokenCls = m.isMulti ? "token token-multi" : "token token-applied";
+          if (state.showDiff) {
+            html += `<span data-match-id="${m.id}" title="클릭하여 적용/건너뛰기 전환" class="${tokenCls}">` +
+              `<del>${escapeHtml(m.original)}</del>` +
+              `<span class="new-word">${escapeHtml(replacement)}</span>` +
+              `</span>`;
+          } else {
+            html += `<span data-match-id="${m.id}" title="원문: ${escapeHtml(m.original)} (클릭하여 전환)" class="${tokenCls}"><span class="new-word">${escapeHtml(replacement)}</span></span>`;
+          }
+        } else {
+          const tokenCls = m.protectReason ? "token token-protected" : "token token-skipped";
+          const tip = m.protectReason ? `${m.protectReason} (클릭하여 강제 적용)` : `건너뜀 (클릭하여 적용)`;
+          html += `<span data-match-id="${m.id}" title="${escapeHtml(tip)}" class="${tokenCls}">${escapeHtml(m.original)}</span>`;
+        }
+
+        cursor = m.end;
+      }
+      html += escapeHtml(text.slice(cursor));
+      container.innerHTML = html;
+
+      container.querySelectorAll("[data-match-id]").forEach(el => {
+        el.addEventListener("click", () => {
+          const id = el.getAttribute("data-match-id");
+          const target = state.matches.find(item => item.id === id);
+          if (target) {
+            target.status = target.status === "applied" ? "skipped" : "applied";
+            renderAll();
+          }
+        });
+      });
+    }
+
+    function renderReviewList() {
+      const container = document.getElementById("reviewListContainer");
+      if (!state.sourceText.trim() || state.matches.length === 0) {
+        container.innerHTML = `<div class="empty-placeholder"><span>탐지된 행정용어 목록이 이곳에 표시됩니다.</span></div>`;
+        return;
+      }
+
+      container.innerHTML = state.matches.map((m, idx) => {
+        const isApplied = m.status === "applied";
+        const currentVal = getReplacementText(m);
+
+        let candidateSelectorHtml = "";
+        if (m.candidates.length > 1) {
+          const optionsHtml = m.candidates.map((c, cIdx) =>
+            `<option value="${cIdx}" ${cIdx === m.selectedCandidateIndex && m.customReplacement === null ? "selected" : ""}>${escapeHtml(c)}</option>`
+          ).join("");
+          candidateSelectorHtml = `
+            <select data-select-id="${m.id}" class="candidate-select">
+              ${optionsHtml}
+            </select>
+          `;
+        }
+
+        const badgeHtml = m.protectReason
+          ? `<span class="pill pill-info">${escapeHtml(m.protectReason)}</span>`
+          : (m.isMulti ? `<span class="pill pill-warn">복수 후보</span>` : "");
+
+        return `
+          <div class="review-card ${isApplied ? "" : "is-skipped"}">
+            <div class="review-card-top">
+              <span class="review-index">#${idx + 1}</span>
+              <div>${badgeHtml}</div>
+            </div>
+
+            <div class="review-diff">
+              <span class="word-old">${escapeHtml(m.original)}</span>
+              <span>→</span>
+              <span class="word-new">${escapeHtml(currentVal)}</span>
+            </div>
+
+            ${candidateSelectorHtml}
+
+            <input
+              type="text"
+              data-custom-input-id="${m.id}"
+              value="${m.customReplacement !== null ? escapeHtml(m.customReplacement) : ""}"
+              placeholder="직접 수정 입력..."
+              class="custom-edit-input"
+            />
+
+            <div class="review-card-actions">
+              <button type="button" data-toggle-id="${m.id}" class="btn btn-sm ${isApplied ? "btn-status-applied" : "btn-status-skipped"}">
+                ${isApplied ? "적용됨" : "건너뜀 (적용하기)"}
+              </button>
+              <button type="button" data-batch-term="${escapeHtml(m.dictKey)}" data-batch-val="${escapeHtml(currentVal)}" class="btn btn-soft btn-sm">
+                동일어 일괄적용
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      container.querySelectorAll("[data-toggle-id]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-toggle-id");
+          const m = state.matches.find(item => item.id === id);
+          if (m) {
+            m.status = m.status === "applied" ? "skipped" : "applied";
+            renderAll();
+          }
+        });
+      });
+
+      container.querySelectorAll("[data-select-id]").forEach(sel => {
+        sel.addEventListener("change", (e) => {
+          const id = sel.getAttribute("data-select-id");
+          const m = state.matches.find(item => item.id === id);
+          if (m) {
+            m.selectedCandidateIndex = Number(e.target.value);
+            m.customReplacement = null;
+            m.status = "applied";
+            renderAll();
+          }
+        });
+      });
+
+      container.querySelectorAll("[data-custom-input-id]").forEach(inp => {
+        inp.addEventListener("change", (e) => {
+          const id = inp.getAttribute("data-custom-input-id");
+          const m = state.matches.find(item => item.id === id);
+          if (m) {
+            const val = e.target.value.trim();
+            m.customReplacement = val ? val : null;
+            m.status = "applied";
+            renderAll();
+          }
+        });
+      });
+
+      container.querySelectorAll("[data-batch-term]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const dictKey = btn.getAttribute("data-batch-term");
+          const batchVal = btn.getAttribute("data-batch-val");
+          let count = 0;
+          state.matches.forEach(m => {
+            if (m.dictKey === dictKey && !m.protectReason) {
+              m.status = "applied";
+              const candIdx = m.candidates.indexOf(batchVal);
+              if (candIdx !== -1) {
+                m.selectedCandidateIndex = candIdx;
+                m.customReplacement = null;
+              } else {
+                m.customReplacement = batchVal;
+              }
+              count++;
+            }
+          });
+          renderAll();
+          showToast(`'${dictKey}' 항목 ${count}건에 일괄 적용했습니다.`);
+        });
+      });
+    }
+
+    /**
+     * ============================================================================
+     * 7. 엑셀 업로드 및 유틸리티 함수
+     * ============================================================================
+     */
+    function handleExcelUpload(file) {
+      if (!file) return;
+      if (typeof XLSX === "undefined") {
+        showToast("엑셀 파서 라이브러리가 로드되지 않았습니다.", "error");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+
+          const targetSheetName = workbook.SheetNames.find(n => n.includes("전체_통합")) || workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[targetSheetName];
+          const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+          const extractedPairs = [];
+          rows.forEach(row => {
+            const keys = Object.keys(row);
+            const termCol = keys.find(k => k.includes("대상")) || keys[0];
+            const purCol = keys.find(k => k.includes("순화")) || keys[1];
+            if (termCol && purCol && row[termCol] && row[purCol]) {
+              extractedPairs.push([row[termCol], row[purCol]]);
+            }
+          });
+
+          if (extractedPairs.length === 0) {
+            showToast("엑셀에서 '대상 용어' 및 '순화어' 컬럼을 찾지 못했습니다.", "error");
+            return;
+          }
+
+          window.__RAW_DICT_PAIRS__ = extractedPairs;
+          state.dictionary = buildNormalizedDictionary(extractedPairs);
+          document.getElementById("dictStatusText").textContent = `${file.name} 로드 완료 (${extractedPairs.length}개)`;
+          showToast(`엑셀 사전(${extractedPairs.length}개 항목)을 성공적으로 불러왔습니다.`);
+
+          if (state.sourceText.trim()) {
+            analyzeText(state.sourceText);
+            renderAll();
+          }
+        } catch (err) {
+          console.error(err);
+          showToast("엑셀 파일을 읽는 중 오류가 발생했습니다.", "error");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.className = `toast ${type === "error" ? "error" : ""}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 260);
+      }, 2800);
+    }
+
+    function copyTextToClipboard(text) {
+      if (!text) {
+        showToast("복사할 내용이 없습니다.", "error");
+        return;
+      }
+      const tempArea = document.createElement("textarea");
+      tempArea.value = text;
+      tempArea.style.position = "fixed";
+      tempArea.style.left = "-9999px";
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      try {
+        document.execCommand("copy");
+        showToast("순화된 문서가 클립보드에 복사되었습니다.");
+      } catch (err) {
+        showToast("클립보드 복사에 실패했습니다.", "error");
+      }
+      document.body.removeChild(tempArea);
+    }
+
+    function renderCustomDictModalLists() {
+      const wlContainer = document.getElementById("whitelistTags");
+      if (state.whitelist.size === 0) {
+        wlContainer.innerHTML = `<span style="font-size:12px;color:#94a3b8;">등록된 예외 단어가 없습니다.</span>`;
+      } else {
+        wlContainer.innerHTML = Array.from(state.whitelist).map(word => `
+          <span class="tag-item">
+            ${escapeHtml(word)}
+            <button type="button" data-del-wl="${escapeHtml(word)}" class="tag-del">&times;</button>
+          </span>
+        `).join("");
+        wlContainer.querySelectorAll("[data-del-wl]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            state.whitelist.delete(btn.getAttribute("data-del-wl"));
+            renderCustomDictModalLists();
+          });
+        });
+      }
+
+      const cdContainer = document.getElementById("customDictList");
+      if (state.customRules.size === 0) {
+        cdContainer.innerHTML = `<span style="font-size:12px;color:#94a3b8;">등록된 사용자 순화어가 없습니다.</span>`;
+      } else {
+        cdContainer.innerHTML = Array.from(state.customRules.entries()).map(([term, cands]) => `
+          <div class="custom-rule-item">
+            <div>
+              <strong>${escapeHtml(term)}</strong> → <span style="color:#1d4ed8;font-weight:600;">${escapeHtml(cands.join(", "))}</span>
+            </div>
+            <button type="button" data-del-cd="${escapeHtml(term)}" class="tag-del">&times;</button>
+          </div>
+        `).join("");
+        cdContainer.querySelectorAll("[data-del-cd]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            state.customRules.delete(btn.getAttribute("data-del-cd"));
+            renderCustomDictModalLists();
+          });
+        });
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 8. 초기 구동 및 이벤트 바인딩
+     * ============================================================================
+     */
+    window.addEventListener("DOMContentLoaded", () => {
+      window.__RAW_DICT_PAIRS__ = DEFAULT_RAW_DICT;
+      state.dictionary = buildNormalizedDictionary(DEFAULT_RAW_DICT);
+
+      const sourceTextarea = document.getElementById("sourceTextarea");
+      const charCount = document.getElementById("charCount");
+
+      sourceTextarea.addEventListener("input", () => {
+        state.sourceText = sourceTextarea.value;
+        charCount.textContent = `${state.sourceText.length.toLocaleString()}자`;
+      });
+
+      document.getElementById("analyzeBtn").addEventListener("click", () => {
+        state.sourceText = sourceTextarea.value;
+        if (!state.sourceText.trim()) {
+          showToast("분석할 보도자료 또는 공고문 원문을 입력해 주세요.", "error");
+          return;
+        }
+        analyzeText(state.sourceText);
+        renderAll();
+        showToast(`총 ${state.matches.length}건의 행정용어를 탐지했습니다.`);
+      });
+
+      document.getElementById("excelFileInput").addEventListener("change", (e) => {
+        handleExcelUpload(e.target.files[0]);
+      });
+
+      document.getElementById("loadSamplePressBtn").addEventListener("click", () => {
+        const sample = `[보도자료] 시, 미래 혁신산업 육성 및 SOC 확충 방안 마련\n\n` +
+          `우리 시는 금번 하반기부터 지역 경제 활성화를 위한 가일층 내실 있는 지원 대책을 추진한다. ` +
+          `금일 발표된 계획에 따르면 R&D 역량 제고와 민관 노하우 연계를 통해 신산업 거점을 조속히 구축할 예정이다.\n\n` +
+          `시 관계자는 "금번 사업은 시민의 삶의 질을 높이기 위한 핵심 과제이며, SOC 투자 확대가 수반될 것"이라고 밝혔다. ` +
+          `또한 「도로교통법」에 따른 가드레일 정비와 가금류 방역 대책도 병행하여 실시한다.`;
+        sourceTextarea.value = sample;
+        state.sourceText = sample;
+        charCount.textContent = `${sample.length.toLocaleString()}자`;
+        analyzeText(sample);
+        renderAll();
+      });
+
+      document.getElementById("loadSampleNoticeBtn").addEventListener("click", () => {
+        const sample = `[공고 제2026-148호] 2026년도 청년 창업 지원사업 참가자 모집 공고\n\n` +
+          `1. 신청 기한: 금일 09:00부터 익일 18:00까지 (기한 내 가접수 불가)\n` +
+          `2. 구비 서류: 사업계획서 및 당해 연도 현황 내역서 각 1부 비치 및 제출\n` +
+          `3. 지원 내용: 전문가 자문 거마비 지급, OA 및 VOD 교육 콘텐츠 상시 제공\n` +
+          `4. 유의 사항: 제출 서류에 미비점이 있거나 허위 사실을 기입한 경우 선정을 취소할 수 있으며, ` +
+          `부득이한 사유 발생 시 별첨 기준에 따라 보완을 요망할 수 있음.`;
+        sourceTextarea.value = sample;
+        state.sourceText = sample;
+        charCount.textContent = `${sample.length.toLocaleString()}자`;
+        analyzeText(sample);
+        renderAll();
+      });
+
+      document.getElementById("clearInputBtn").addEventListener("click", () => {
+        sourceTextarea.value = "";
+        state.sourceText = "";
+        state.matches = [];
+        charCount.textContent = "0자";
+        renderAll();
+      });
+
+      document.getElementById("toggleDiffModeBtn").addEventListener("click", (e) => {
+        state.showDiff = !state.showDiff;
+        e.target.textContent = `비교 표시: ${state.showDiff ? "ON" : "OFF"}`;
+        renderPreview();
+      });
+
+      document.getElementById("copyResultBtn").addEventListener("click", () => {
+        copyTextToClipboard(buildFinalPurifiedText());
+      });
+
+      document.getElementById("downloadResultBtn").addEventListener("click", () => {
+        const output = buildFinalPurifiedText();
+        if (!output.trim()) {
+          showToast("저장할 내용이 없습니다.", "error");
+          return;
+        }
+        const blob = new Blob([output], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `행정용어_순화결과_${new Date().toISOString().slice(0, 10)}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast("순화 결과 파일(.txt)이 저장되었습니다.");
+      });
+
+      document.getElementById("applyAllBtn").addEventListener("click", () => {
+        state.matches.forEach(m => {
+          if (!m.protectReason) m.status = "applied";
+        });
+        renderAll();
+        showToast("보호 구간을 제외한 모든 항목에 순화를 적용했습니다.");
+      });
+
+      document.getElementById("skipAllBtn").addEventListener("click", () => {
+        state.matches.forEach(m => {
+          m.status = "skipped";
+        });
+        renderAll();
+        showToast("모든 항목을 건너뜀 상태로 변경했습니다.");
+      });
+
+      ["optProtectQuotes", "optProtectProperNouns", "optCaseSensitive"].forEach(id => {
+        document.getElementById(id).addEventListener("change", () => {
+          if (state.sourceText.trim()) {
+            analyzeText(state.sourceText);
+            renderAll();
+          }
+        });
+      });
+
+      // 모달 제어
+      const modal = document.getElementById("customDictModal");
+      document.getElementById("openCustomDictBtn").addEventListener("click", () => {
+        renderCustomDictModalLists();
+        modal.classList.add("open");
+      });
+
+      document.getElementById("closeCustomDictBtn").addEventListener("click", () => {
+        modal.classList.remove("open");
+      });
+
+      document.getElementById("addWhitelistBtn").addEventListener("click", () => {
+        const inp = document.getElementById("whitelistInput");
+        const val = inp.value.trim();
+        if (val) {
+          state.whitelist.add(val);
+          inp.value = "";
+          renderCustomDictModalLists();
+        }
+      });
+
+      document.getElementById("addCustomDictBtn").addEventListener("click", () => {
+        const termInp = document.getElementById("customTermInput");
+        const purInp = document.getElementById("customPurifiedInput");
+        const term = termInp.value.trim();
+        const cands = parsePurifiedCandidates(purInp.value);
+        if (term && cands.length > 0) {
+          state.customRules.set(term, cands);
+          termInp.value = "";
+          purInp.value = "";
+          renderCustomDictModalLists();
+        }
+      });
+
+      document.getElementById("saveAndReanalyzeBtn").addEventListener("click", () => {
+        state.dictionary = buildNormalizedDictionary(window.__RAW_DICT_PAIRS__);
+        modal.classList.remove("open");
+        if (state.sourceText.trim()) {
+          analyzeText(state.sourceText);
+          renderAll();
+        }
+        showToast("예외 및 사용자 사전 설정이 반영되었습니다.");
+      });
+    });
+  </script>
+</body>
+</html>
